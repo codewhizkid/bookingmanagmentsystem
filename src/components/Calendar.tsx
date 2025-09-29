@@ -103,6 +103,10 @@ export const Calendar: React.FC = () => {
 
   const getAppointmentsForDate = (date: Date) => {
     const dateStr = date.toISOString().split('T')[0];
+    const filteredAppointments = selectedStylist === 'all' 
+      ? appointments 
+      : appointments.filter(apt => apt.stylist_id === selectedStylist);
+    return filteredAppointments.filter(apt => apt.appointment_date === dateStr);
   };
 
 
@@ -140,6 +144,15 @@ export const Calendar: React.FC = () => {
   const filteredAppointments = selectedStylist === 'all' 
     ? appointments 
     : appointments.filter(apt => apt.stylist_id === selectedStylist);
+
+  // Generate basic time slots for week view
+  const generateTimeSlots = (): TimeSlot[] => {
+    return baseTimeSlots.map(time => ({
+      time,
+      available: true,
+      appointment: undefined
+    }));
+  };
 
   const timeSlots = generateTimeSlots();
 
