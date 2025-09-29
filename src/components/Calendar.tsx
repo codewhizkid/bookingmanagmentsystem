@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { dbHelpers } from '../lib/supabase';
+import { WeekView } from './calendar/WeekView';
 import { NewAppointmentModal } from './appointments/NewAppointmentModal';
 import { AppointmentDetailsModal } from './appointments/AppointmentDetailsModal';
 import { Appointment, Service, Stylist, TimeSlot } from '../types';
@@ -155,8 +156,12 @@ export const Calendar: React.FC = () => {
   };
 
   const handleTimeSlotClick = (time: string, available: boolean) => {
+  const handleTimeSlotClick = (time: string, available: boolean, date?: Date) => {
     if (available) {
       setSelectedTimeSlot(time);
+      if (date) {
+        setCurrentDate(date);
+      }
       setShowNewAppointmentModal(true);
     }
   };
@@ -266,65 +271,15 @@ export const Calendar: React.FC = () => {
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Stylist
-                </label>
-                <select
-                  value={selectedStylist}
-                  onChange={(e) => setSelectedStylist(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                >
-                  <option value="all">All Stylists</option>
-                  {stylists.map((stylist) => (
-                    <option key={stylist.id} value={stylist.id}>
-                      {stylist.user?.full_name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-          </div>
-
-          {/* Today's Summary */}
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-            <h3 className="font-semibold text-gray-900 mb-4">Today's Summary</h3>
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">Total Appointments</span>
-                <span className="font-semibold text-gray-900">{filteredAppointments.length}</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">Revenue</span>
-                <span className="font-semibold text-green-600">
-                  ${filteredAppointments.reduce((sum, apt) => sum + apt.total_amount, 0)}
-                </span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">Available Slots</span>
-                <span className="font-semibold text-blue-600">
-                  {timeSlots.filter(slot => slot.available).length}
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Calendar Grid */}
-        <div className="lg:col-span-3">
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100">
-            <div className="p-6 border-b border-gray-100">
-              <div className="flex items-center justify-between">
-                <h2 className="text-lg font-semibold text-gray-900">
-                  {viewMode === 'day' ? formatDate(currentDate) : 'Week View'}
-                </h2>
-                <div className="flex items-center space-x-2 text-sm text-gray-600">
-                  <CalendarIcon className="w-4 h-4" />
-                  <span>
-                    {viewMode === 'day' 
-                      ? `${filteredAppointments.length} appointments` 
-                      : `${appointments.length} appointments this week`
-                    }
-                  </span>
-                </div>
-              </div>
+              <WeekView
+                weekDays={generateWeekDays()}
+                timeSlots={timeSlots}
+                appointments={appointments}
+                onTimeSlotClick={handleTimeSlotClick}
+                onAppointmentClick={handleAppointmentClick}
+                getStatusColor={getStatusColor}
+                selectedStylist={selectedStylist}
+              />
             </div>
 
             <div className="p-6">

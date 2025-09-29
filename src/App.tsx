@@ -4,6 +4,12 @@ import { AuthForm } from './components/auth/AuthForm';
 import { Layout } from './components/Layout';
 import { Dashboard } from './components/Dashboard';
 import { Calendar } from './components/Calendar';
+import { Appointments } from './components/pages/Appointments';
+import { Customers } from './components/pages/Customers';
+import { Services } from './components/pages/Services';
+import { Staff } from './components/pages/Staff';
+import { Reports } from './components/pages/Reports';
+import { Settings } from './components/pages/Settings';
 
 function AppContent() {
   const { user, loading } = useAuth();
@@ -30,47 +36,17 @@ function AppContent() {
       case 'calendar':
         return <Calendar />;
       case 'appointments':
-        return (
-          <div className="text-center py-12">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Appointments</h2>
-            <p className="text-gray-600">Appointments management coming soon!</p>
-          </div>
-        );
+        return <Appointments />;
       case 'customers':
-        return (
-          <div className="text-center py-12">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Customers</h2>
-            <p className="text-gray-600">Customer management coming soon!</p>
-          </div>
-        );
+        return <Customers />;
       case 'services':
-        return (
-          <div className="text-center py-12">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Services</h2>
-            <p className="text-gray-600">Service management coming soon!</p>
-          </div>
-        );
+        return <Services />;
       case 'staff':
-        return (
-          <div className="text-center py-12">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Staff</h2>
-            <p className="text-gray-600">Staff management coming soon!</p>
-          </div>
-        );
+        return <Staff />;
       case 'reports':
-        return (
-          <div className="text-center py-12">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Reports</h2>
-            <p className="text-gray-600">Analytics and reports coming soon!</p>
-          </div>
-        );
+        return <Reports />;
       case 'settings':
-        return (
-          <div className="text-center py-12">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Settings</h2>
-            <p className="text-gray-600">Settings panel coming soon!</p>
-          </div>
-        );
+        return <Settings />;
       default:
         return <Dashboard />;
     }
