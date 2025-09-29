@@ -155,12 +155,9 @@ export const Calendar: React.FC = () => {
     }
   };
 
-  const handleTimeSlotClick = (time: string, available: boolean, date?: Date) => {
+  const handleTimeSlotClick = (time: string, available: boolean) => {
     if (available) {
       setSelectedTimeSlot(time);
-      if (date) {
-        setCurrentDate(date);
-      }
       setShowNewAppointmentModal(true);
     }
   };
@@ -218,9 +215,9 @@ export const Calendar: React.FC = () => {
             </div>
 
             {/* New Appointment Button */}
-            <button className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200" onClick={() => setShowNewAppointmentModal(true)}>
+            <button className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200">
               <Plus className="w-4 h-4" />
-              <span>New Appointment</span>
+              <span onClick={() => setShowNewAppointmentModal(true)}>New Appointment</span>
             </button>
           </div>
         </div>
@@ -291,7 +288,7 @@ export const Calendar: React.FC = () => {
         {/* Main Calendar Area */}
         <div className="lg:col-span-3">
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100">
-            <div className="border-b border-gray-200 p-6">
+            <div className="border-b border-gray-100 p-6">
               <div className="flex items-center justify-between">
                 <h2 className="text-xl font-semibold text-gray-900">
                   {viewMode === 'day' ? formatDate(currentDate) : 'Week View'}
@@ -305,7 +302,7 @@ export const Calendar: React.FC = () => {
                   </button>
                   <button
                     onClick={() => setCurrentDate(new Date())}
-                    className="px-3 py-1 text-sm text-blue-600 hover:bg-blue-50 rounded-lg transition-colors duration-200"
+                    className="px-3 py-1 text-sm font-medium text-blue-600 hover:bg-blue-50 rounded-lg transition-colors duration-200"
                   >
                     Today
                   </button>
