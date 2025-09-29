@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { supabase } from '../lib/supabase';
+import { supabase, dbHelpers } from '../lib/supabase';
 import { User, Salon, AuthContextType } from '../types';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -58,14 +58,31 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       if (profile) {
         setUser(profile);
         
-        // Fetch salon if user is salon owner or stylist
-        if (profile.salon_id) {
-          const { data: salonData } = await supabase
+        // Fetch salon if user has salon_id or is salon owner
+        let salonId = profile.salon_id;
+        
+        if (!salonId && profile.role === 'salon_owner') {
+          // If salon owner but no salon_id, find their salon
+          const { data: ownedSalon } = await supabase
             .from('salons')
-            .select('*')
-            .eq('id', profile.salon_id)
+            .select('id')
+            .eq('owner_id', profile.id)
             .single();
           
+          if (ownedSalon) {
+            salonId = ownedSalon.id;
+            // Update user profile with salon_id
+            await supabase
+              .from('users')
+              .update({ salon_id: salonId })
+              .eq('id', profile.id);
+            
+            setUser({ ...profile, salon_id: salonId });
+          }
+        }
+        
+        if (salonId) {
+          const salonData = await dbHelpers.getSalonWithHours(salonId);
           if (salonData) {
             setSalon(salonData);
           }
@@ -75,6 +92,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       console.error('Error fetching user profile:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const refreshUser = async () => {
+    const { data: { user: authUser } } = await supabase.auth.getUser();
+    if (authUser) {
+      await fetchUserProfile(authUser.id);
     }
   };
 
@@ -128,6 +152,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     signIn,
     signUp,
     signOut,
+    refreshUser,
   };
 
   return (
