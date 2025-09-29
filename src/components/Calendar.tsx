@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { dbHelpers } from '../lib/supabase';
-import { WeekView } from './calendar/WeekView';
 import { NewAppointmentModal } from './appointments/NewAppointmentModal';
 import { AppointmentDetailsModal } from './appointments/AppointmentDetailsModal';
 import { Appointment, Service, Stylist, TimeSlot } from '../types';
@@ -156,12 +155,8 @@ export const Calendar: React.FC = () => {
   };
 
   const handleTimeSlotClick = (time: string, available: boolean) => {
-  const handleTimeSlotClick = (time: string, available: boolean, date?: Date) => {
     if (available) {
       setSelectedTimeSlot(time);
-      if (date) {
-        setCurrentDate(date);
-      }
       setShowNewAppointmentModal(true);
     }
   };
@@ -219,9 +214,9 @@ export const Calendar: React.FC = () => {
             </div>
 
             {/* New Appointment Button */}
-            <button className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200">
+            <button className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200" onClick={() => setShowNewAppointmentModal(true)}>
               <Plus className="w-4 h-4" />
-              <span onClick={() => setShowNewAppointmentModal(true)}>New Appointment</span>
+              <span>New Appointment</span>
             </button>
           </div>
         </div>
@@ -271,15 +266,31 @@ export const Calendar: React.FC = () => {
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Stylist
-              <WeekView
-                weekDays={generateWeekDays()}
-                timeSlots={timeSlots}
-                appointments={appointments}
-                onTimeSlotClick={handleTimeSlotClick}
-                onAppointmentClick={handleAppointmentClick}
-                getStatusColor={getStatusColor}
-                selectedStylist={selectedStylist}
-              />
+                </label>
+                <select
+                  value={selectedStylist}
+                  onChange={(e) => setSelectedStylist(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                >
+                  <option value="all">All Stylists</option>
+                  {stylists.map((stylist) => (
+                    <option key={stylist.id} value={stylist.id}>
+                      {stylist.user?.full_name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Main Calendar */}
+        <div className="lg:col-span-3">
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100">
+            <div className="p-6 border-b border-gray-100">
+              <h2 className="text-xl font-semibold text-gray-900">
+                {viewMode === 'day' ? formatDate(currentDate) : 'Week View'}
+              </h2>
             </div>
 
             <div className="p-6">
