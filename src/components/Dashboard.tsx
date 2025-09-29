@@ -2,22 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { dbHelpers } from '../lib/supabase';
 import { Appointment, Service, Stylist } from '../types';
-import { 
-  Calendar,
-  Clock,
-  Users,
-  DollarSign,
-  TrendingUp,
-  CheckCircle,
-  AlertCircle,
-  XCircle,
-  Plus,
-  Eye,
-  Edit,
-  Star,
-  MapPin,
-  Phone
-} from 'lucide-react';
+import { Calendar, Clock, Users, DollarSign, TrendingUp, CheckCircle, AlertCircle, XCircle, Plus, Eye, CreditCard as Edit, Star, MapPin, Phone } from 'lucide-react';
 
 export const Dashboard: React.FC = () => {
   const { user, salon } = useAuth();
