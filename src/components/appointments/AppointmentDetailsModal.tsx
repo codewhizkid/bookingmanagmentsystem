@@ -1,22 +1,7 @@
 import React, { useState } from 'react';
 import { Appointment } from '../../types';
 import { dbHelpers } from '../../lib/supabase';
-import { 
-  X, 
-  Clock, 
-  User, 
-  Scissors, 
-  Calendar,
-  Phone,
-  Mail,
-  MapPin,
-  DollarSign,
-  Edit3,
-  Trash2,
-  CheckCircle,
-  XCircle,
-  AlertCircle
-} from 'lucide-react';
+import { X, Clock, User, Scissors, Calendar, Phone, Mail, MapPin, DollarSign, CreditCard as Edit3, Trash2, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
 
 interface AppointmentDetailsModalProps {
   appointment: Appointment | null;
