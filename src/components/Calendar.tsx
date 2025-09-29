@@ -291,11 +291,10 @@ export const Calendar: React.FC = () => {
         {/* Main Calendar Area */}
         <div className="lg:col-span-3">
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100">
-            {/* Calendar Header */}
-            <div className="p-6 border-b border-gray-100">
+            <div className="border-b border-gray-200 p-6">
               <div className="flex items-center justify-between">
                 <h2 className="text-xl font-semibold text-gray-900">
-                  {viewMode === 'week' ? 'Week View' : formatDate(currentDate)}
+                  {viewMode === 'day' ? formatDate(currentDate) : 'Week View'}
                 </h2>
                 <div className="flex items-center space-x-2">
                   <button
@@ -306,7 +305,7 @@ export const Calendar: React.FC = () => {
                   </button>
                   <button
                     onClick={() => setCurrentDate(new Date())}
-                    className="px-3 py-1 text-sm font-medium text-blue-600 hover:bg-blue-50 rounded-lg transition-colors duration-200"
+                    className="px-3 py-1 text-sm text-blue-600 hover:bg-blue-50 rounded-lg transition-colors duration-200"
                   >
                     Today
                   </button>
