@@ -1,15 +1,18 @@
 import React from 'react';
-import { Appointment, TimeSlot } from '../../types';
+import { Appointment, TimeSlot, Salon, Stylist } from '../../types';
+import { generateAvailableTimeSlots } from '../../lib/businessHours';
 import { Plus } from 'lucide-react';
 
 interface WeekViewProps {
   weekDays: Date[];
-  timeSlots: TimeSlot[];
+  timeSlots: { time: string; available: boolean }[];
   appointments: Appointment[];
-  onTimeSlotClick: (time: string, available: boolean, date?: Date) => void;
+  onTimeSlotClick: (time: string, available: boolean) => void;
   onAppointmentClick: (appointment: Appointment) => void;
   getStatusColor: (status: string) => string;
   selectedStylist: string;
+  salon: Salon | null;
+  stylists: Stylist[];
 }
 
 export const WeekView: React.FC<WeekViewProps> = ({
@@ -19,7 +22,9 @@ export const WeekView: React.FC<WeekViewProps> = ({
   onTimeSlotClick,
   onAppointmentClick,
   getStatusColor,
-  selectedStylist
+  selectedStylist,
+  salon,
+  stylists
 }) => {
   const getAppointmentsForDate = (date: Date) => {
     const dateStr = date.toISOString().split('T')[0];
@@ -29,13 +34,28 @@ export const WeekView: React.FC<WeekViewProps> = ({
     return filteredAppointments.filter(apt => apt.appointment_date === dateStr);
   };
 
-  const isBusinessHour = (time: string, date: Date) => {
-    // Basic business hours logic - 9 AM to 6 PM, Monday to Saturday
-    const dayOfWeek = date.getDay();
-    if (dayOfWeek === 0) return false; // Sunday closed
+  const isTimeSlotAvailable = (time: string, date: Date) => {
+    if (!salon?.business_hours) return false;
     
-    const [hours] = time.split(':').map(Number);
-    return hours >= 9 && hours < 18;
+    const dayAppointments = getAppointmentsForDate(date);
+    const stylistAppointments = selectedStylist === 'all' 
+      ? dayAppointments 
+      : dayAppointments.filter(apt => apt.stylist_id === selectedStylist);
+    
+    // Generate available time slots using business logic
+    const availableTimeStrings = generateAvailableTimeSlots(
+      date,
+      {
+        businessHours: salon.business_hours || [],
+        existingAppointments: stylistAppointments.map(apt => ({
+          start_time: apt.start_time,
+          end_time: apt.end_time
+        }))
+      },
+      60 // Default service duration
+    );
+    
+    return availableTimeStrings.includes(time);
   };
 
   return (
@@ -72,13 +92,13 @@ export const WeekView: React.FC<WeekViewProps> = ({
               {weekDays.map((day, dayIndex) => {
                 const dayAppointments = getAppointmentsForDate(day);
                 const slotAppointment = dayAppointments.find(apt => apt.start_time === slot.time);
-                const isAvailable = isBusinessHour(slot.time, day) && !slotAppointment;
+                const isAvailable = isTimeSlotAvailable(slot.time, day) && !slotAppointment;
                 const isToday = day.toDateString() === new Date().toDateString();
                 
                 return (
                   <div
                     key={dayIndex}
-                    onClick={() => isAvailable && onTimeSlotClick(slot.time, true, day)}
+                    onClick={() => isAvailable && onTimeSlotClick(slot.time, true)}
                     className={`bg-white p-2 min-h-[60px] transition-all duration-200 border-l-2 ${
                       isToday ? 'border-l-blue-300 bg-blue-50/30' : 'border-l-transparent'
                     } ${

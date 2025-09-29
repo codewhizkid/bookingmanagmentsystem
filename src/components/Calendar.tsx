@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { dbHelpers } from '../lib/supabase';
-import { WeekView } from './calendar/WeekView';
+import { generateAvailableTimeSlots } from '../lib/businessHours';
 import { NewAppointmentModal } from './appointments/NewAppointmentModal';
 import { AppointmentDetailsModal } from './appointments/AppointmentDetailsModal';
 import { Appointment, Service, Stylist, TimeSlot } from '../types';
@@ -32,6 +32,20 @@ export const Calendar: React.FC = () => {
   const [showAppointmentDetails, setShowAppointmentDetails] = useState(false);
   const [selectedTimeSlot, setSelectedTimeSlot] = useState<string>('');
 
+  // Base time slots for calendar grid (9 AM to 6 PM, 30-minute intervals)
+  const baseTimeSlots = React.useMemo(() => {
+    const slots: string[] = [];
+    const startHour = 9;
+    const endHour = 18;
+    
+    for (let hour = startHour; hour < endHour; hour++) {
+      for (let minute = 0; minute < 60; minute += 30) {
+        const time = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+        slots.push(time);
+      }
+    }
+    return slots;
+  }, []);
   useEffect(() => {
     if (salon?.id) {
       fetchCalendarData();
@@ -89,30 +103,40 @@ export const Calendar: React.FC = () => {
 
   const getAppointmentsForDate = (date: Date) => {
     const dateStr = date.toISOString().split('T')[0];
-    return filteredAppointments.filter(apt => apt.appointment_date === dateStr);
   };
 
-  const generateTimeSlots = (): TimeSlot[] => {
-    const slots: TimeSlot[] = [];
-    const startHour = 9; // 9 AM
-    const endHour = 18; // 6 PM
-    
-    for (let hour = startHour; hour < endHour; hour++) {
-      for (let minute = 0; minute < 60; minute += 30) {
-        const time = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
-        const appointment = filteredAppointments.find(apt => apt.start_time === time);
-        
-        slots.push({
-          time,
-          available: !appointment,
-          appointment
-        });
-      }
-    }
-    
-    return slots;
-  };
 
+  // Process time slots for Day View with availability logic
+  const processedDayTimeSlots = React.useMemo((): TimeSlot[] => {
+    if (!salon?.business_hours) return [];
+    
+    const dayAppointments = getAppointmentsForDate(currentDate);
+    const stylistAppointments = selectedStylist === 'all' 
+      ? dayAppointments 
+      : dayAppointments.filter(apt => apt.stylist_id === selectedStylist);
+    
+    // Generate available time slots using business logic
+    const availableTimeStrings = generateAvailableTimeSlots(
+      currentDate,
+      {
+        businessHours: salon.business_hours || [],
+        existingAppointments: stylistAppointments.map(apt => ({
+          start_time: apt.start_time,
+          end_time: apt.end_time
+        }))
+      },
+      60 // Default service duration
+    );
+    
+    return baseTimeSlots.map(time => {
+      const appointment = stylistAppointments.find(apt => apt.start_time === time);
+      return {
+        time,
+        available: availableTimeStrings.includes(time) && !appointment,
+        appointment
+      };
+    });
+  }, [salon?.business_hours, currentDate, selectedStylist, appointments, baseTimeSlots]);
   const filteredAppointments = selectedStylist === 'all' 
     ? appointments 
     : appointments.filter(apt => apt.stylist_id === selectedStylist);
@@ -215,9 +239,9 @@ export const Calendar: React.FC = () => {
             </div>
 
             {/* New Appointment Button */}
-            <button className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200">
+            <button className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200" onClick={() => setShowNewAppointmentModal(true)}>
               <Plus className="w-4 h-4" />
-              <span onClick={() => setShowNewAppointmentModal(true)}>New Appointment</span>
+              <span>New Appointment</span>
             </button>
           </div>
         </div>
@@ -285,53 +309,19 @@ export const Calendar: React.FC = () => {
           </div>
         </div>
 
-        {/* Main Calendar Area */}
+        {/* Main Calendar */}
         <div className="lg:col-span-3">
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100">
-            <div className="border-b border-gray-100 p-6">
-              <div className="flex items-center justify-between">
-                <h2 className="text-xl font-semibold text-gray-900">
-                  {viewMode === 'day' ? formatDate(currentDate) : 'Week View'}
-                </h2>
-                <div className="flex items-center space-x-2">
-                  <button
-                    onClick={() => navigateDate('prev')}
-                    className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors duration-200"
-                  >
-                    <ChevronLeft className="w-5 h-5" />
-                  </button>
-                  <button
-                    onClick={() => setCurrentDate(new Date())}
-                    className="px-3 py-1 text-sm font-medium text-blue-600 hover:bg-blue-50 rounded-lg transition-colors duration-200"
-                  >
-                    Today
-                  </button>
-                  <button
-                    onClick={() => navigateDate('next')}
-                    className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors duration-200"
-                  >
-                    <ChevronRight className="w-5 h-5" />
-                  </button>
-                </div>
-              </div>
+            <div className="p-6 border-b border-gray-100">
+              <h2 className="text-xl font-semibold text-gray-900">
+                {viewMode === 'day' ? formatDate(currentDate) : 'Week View'}
+              </h2>
             </div>
-
-            {viewMode === 'week' && (
-              <WeekView
-                weekDays={generateWeekDays()}
-                timeSlots={timeSlots}
-                appointments={appointments}
-                onTimeSlotClick={handleTimeSlotClick}
-                onAppointmentClick={handleAppointmentClick}
-                getStatusColor={getStatusColor}
-                selectedStylist={selectedStylist}
-              />
-            )}
 
             <div className="p-6">
               {viewMode === 'day' ? (
                 <div className="space-y-2">
-                  {timeSlots.map((slot) => (
+                  {processedDayTimeSlots.map((slot) => (
                     <div
                       key={slot.time}
                       onClick={() => handleTimeSlotClick(slot.time, slot.available)}

@@ -15,6 +15,7 @@ interface Customer {
 
 export const Customers: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
+  // TODO: Replace mock data with real Supabase integration
   const [customers] = useState<Customer[]>([
     {
       id: '1',
