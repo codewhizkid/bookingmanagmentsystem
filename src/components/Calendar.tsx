@@ -155,9 +155,12 @@ export const Calendar: React.FC = () => {
     }
   };
 
-  const handleTimeSlotClick = (time: string, available: boolean) => {
+  const handleTimeSlotClick = (time: string, available: boolean, date?: Date) => {
     if (available) {
       setSelectedTimeSlot(time);
+      if (date) {
+        setCurrentDate(date);
+      }
       setShowNewAppointmentModal(true);
     }
   };
@@ -215,9 +218,9 @@ export const Calendar: React.FC = () => {
             </div>
 
             {/* New Appointment Button */}
-            <button className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200">
+            <button className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200" onClick={() => setShowNewAppointmentModal(true)}>
               <Plus className="w-4 h-4" />
-              <span onClick={() => setShowNewAppointmentModal(true)}>New Appointment</span>
+              <span>New Appointment</span>
             </button>
           </div>
         </div>
@@ -288,10 +291,11 @@ export const Calendar: React.FC = () => {
         {/* Main Calendar Area */}
         <div className="lg:col-span-3">
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100">
-            <div className="border-b border-gray-100 p-6">
+            {/* Calendar Header */}
+            <div className="p-6 border-b border-gray-100">
               <div className="flex items-center justify-between">
                 <h2 className="text-xl font-semibold text-gray-900">
-                  {viewMode === 'day' ? formatDate(currentDate) : 'Week View'}
+                  {viewMode === 'week' ? 'Week View' : formatDate(currentDate)}
                 </h2>
                 <div className="flex items-center space-x-2">
                   <button
