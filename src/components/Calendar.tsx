@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { dbHelpers } from '../lib/supabase';
+import { WeekView } from './calendar/WeekView';
 import { NewAppointmentModal } from './appointments/NewAppointmentModal';
 import { AppointmentDetailsModal } from './appointments/AppointmentDetailsModal';
 import { Appointment, Service, Stylist, TimeSlot } from '../types';
@@ -214,9 +215,9 @@ export const Calendar: React.FC = () => {
             </div>
 
             {/* New Appointment Button */}
-            <button className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200" onClick={() => setShowNewAppointmentModal(true)}>
+            <button className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200">
               <Plus className="w-4 h-4" />
-              <span>New Appointment</span>
+              <span onClick={() => setShowNewAppointmentModal(true)}>New Appointment</span>
             </button>
           </div>
         </div>
@@ -284,14 +285,48 @@ export const Calendar: React.FC = () => {
           </div>
         </div>
 
-        {/* Main Calendar */}
+        {/* Main Calendar Area */}
         <div className="lg:col-span-3">
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100">
-            <div className="p-6 border-b border-gray-100">
-              <h2 className="text-xl font-semibold text-gray-900">
-                {viewMode === 'day' ? formatDate(currentDate) : 'Week View'}
-              </h2>
+            <div className="border-b border-gray-100 p-6">
+              <div className="flex items-center justify-between">
+                <h2 className="text-xl font-semibold text-gray-900">
+                  {viewMode === 'day' ? formatDate(currentDate) : 'Week View'}
+                </h2>
+                <div className="flex items-center space-x-2">
+                  <button
+                    onClick={() => navigateDate('prev')}
+                    className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors duration-200"
+                  >
+                    <ChevronLeft className="w-5 h-5" />
+                  </button>
+                  <button
+                    onClick={() => setCurrentDate(new Date())}
+                    className="px-3 py-1 text-sm font-medium text-blue-600 hover:bg-blue-50 rounded-lg transition-colors duration-200"
+                  >
+                    Today
+                  </button>
+                  <button
+                    onClick={() => navigateDate('next')}
+                    className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors duration-200"
+                  >
+                    <ChevronRight className="w-5 h-5" />
+                  </button>
+                </div>
+              </div>
             </div>
+
+            {viewMode === 'week' && (
+              <WeekView
+                weekDays={generateWeekDays()}
+                timeSlots={timeSlots}
+                appointments={appointments}
+                onTimeSlotClick={handleTimeSlotClick}
+                onAppointmentClick={handleAppointmentClick}
+                getStatusColor={getStatusColor}
+                selectedStylist={selectedStylist}
+              />
+            )}
 
             <div className="p-6">
               {viewMode === 'day' ? (
