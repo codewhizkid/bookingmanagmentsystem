@@ -18,9 +18,10 @@ import {
 interface LayoutProps {
   children: React.ReactNode;
   currentPage?: string;
+  onNavigate?: (page: string) => void;
 }
 
-export const Layout: React.FC<LayoutProps> = ({ children, currentPage = 'dashboard' }) => {
+export const Layout: React.FC<LayoutProps> = ({ children, currentPage = 'dashboard', onNavigate }) => {
   const { user, salon, signOut } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
@@ -82,7 +83,9 @@ export const Layout: React.FC<LayoutProps> = ({ children, currentPage = 'dashboa
           <button
             key={item.name}
             onClick={() => {
-              // Handle navigation here
+              if (onNavigate) {
+                onNavigate(item.id);
+              }
               if (mobile) setSidebarOpen(false);
             }}
             className={`w-full flex items-center px-3 py-3 text-sm font-medium rounded-xl transition-all duration-200 ${

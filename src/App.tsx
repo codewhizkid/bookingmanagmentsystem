@@ -76,8 +76,12 @@ function AppContent() {
     }
   };
 
+  const handleNavigate = (page: string) => {
+    setCurrentPage(page);
+  };
+
   return (
-    <Layout currentPage={currentPage}>
+    <Layout currentPage={currentPage} onNavigate={handleNavigate}>
       {renderPage()}
     </Layout>
   );
