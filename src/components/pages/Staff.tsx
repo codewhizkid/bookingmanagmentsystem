@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { dbHelpers } from '../../lib/supabase';
 import { Stylist } from '../../types';
-import { UserCheck, Plus, Search, Mail, Phone, Star, DollarSign, Calendar, Edit3, Eye } from 'lucide-react';
+import { UserCheck, Plus, Search, Mail, Phone, Star, DollarSign, Calendar, CreditCard as Edit3, Eye } from 'lucide-react';
 
 export const Staff: React.FC = () => {
   const { salon, user } = useAuth();

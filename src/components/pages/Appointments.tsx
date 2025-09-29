@@ -4,19 +4,7 @@ import { dbHelpers } from '../../lib/supabase';
 import { Appointment } from '../../types';
 import { AppointmentDetailsModal } from '../appointments/AppointmentDetailsModal';
 import { NewAppointmentModal } from '../appointments/NewAppointmentModal';
-import { 
-  Clock, 
-  Plus, 
-  Search, 
-  Filter, 
-  Calendar,
-  User,
-  CheckCircle,
-  AlertCircle,
-  XCircle,
-  Eye,
-  Edit3
-} from 'lucide-react';
+import { Clock, Plus, Search, Filter, Calendar, User, CheckCircle, AlertCircle, XCircle, Eye, CreditCard as Edit3 } from 'lucide-react';
 
 export const Appointments: React.FC = () => {
   const { salon } = useAuth();

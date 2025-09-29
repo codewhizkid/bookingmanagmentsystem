@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { dbHelpers } from '../../lib/supabase';
 import { Service } from '../../types';
-import { Scissors, Plus, Search, Clock, DollarSign, Edit3, Trash2, Tag } from 'lucide-react';
+import { Scissors, Plus, Search, Clock, DollarSign, CreditCard as Edit3, Trash2, Tag } from 'lucide-react';
 
 export const Services: React.FC = () => {
   const { salon } = useAuth();

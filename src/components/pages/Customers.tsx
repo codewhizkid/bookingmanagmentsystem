@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Users, Plus, Search, Mail, Phone, Calendar, DollarSign, Star, Eye, Edit3 } from 'lucide-react';
+import { Users, Plus, Search, Mail, Phone, Calendar, DollarSign, Star, Eye, CreditCard as Edit3 } from 'lucide-react';
 
 interface Customer {
   id: string;
