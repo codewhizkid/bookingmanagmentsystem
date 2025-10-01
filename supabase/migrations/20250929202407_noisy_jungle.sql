@@ -40,21 +40,6 @@ VALUES (
   now()
 ) ON CONFLICT (id) DO NOTHING;
 
--- Insert sample salon
-INSERT INTO salons (id, name, description, address, city, state, zip_code, phone, email, owner_id)
-VALUES (
-  '660e8400-e29b-41d4-a716-446655440000',
-  'Elite Hair Studio',
-  'Premium hair salon offering cutting-edge styles and treatments',
-  '123 Main Street',
-  'New York',
-  'NY',
-  '10001',
-  '(555) 123-4567',
-  'info@elitehairstudio.com',
-  '550e8400-e29b-41d4-a716-446655440000'
-) ON CONFLICT (id) DO NOTHING;
-
 -- Insert user profiles
 INSERT INTO users (id, email, full_name, phone, role, salon_id)
 VALUES 
@@ -83,6 +68,21 @@ VALUES
     '660e8400-e29b-41d4-a716-446655440000'
   )
 ON CONFLICT (id) DO NOTHING;
+
+-- Insert sample salon (after users are created)
+INSERT INTO salons (id, name, description, address, city, state, zip_code, phone, email, owner_id)
+VALUES (
+  '660e8400-e29b-41d4-a716-446655440000',
+  'Elite Hair Studio',
+  'Premium hair salon offering cutting-edge styles and treatments',
+  '123 Main Street',
+  'New York',
+  'NY',
+  '10001',
+  '(555) 123-4567',
+  'info@elitehairstudio.com',
+  '550e8400-e29b-41d4-a716-446655440000'
+) ON CONFLICT (id) DO NOTHING;
 
 -- Insert business hours (Monday to Saturday, closed Sunday)
 INSERT INTO business_hours (salon_id, day_of_week, open_time, close_time, is_closed)
